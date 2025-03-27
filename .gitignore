@@ -1,0 +1,24 @@
+# Seashell
+# Ignore build artifacts
+/target/
+
+# Ignore Rust/Cargo files
+**/*.rs.bk
+**/*.rs.swp
+
+# Ignore editor-specific files
+/.vscode/
+/.idea/
+*.swp
+*.swo
+
+# Ignore logs
+seashell.log
+
+# Ignore temporary files
+*.tmp
+*.bak
+*.old
+
+# Ignore Cargo.lock for libraries
+Cargo.lock

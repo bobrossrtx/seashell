@@ -1,0 +1,14 @@
+[package]
+name = "seashell"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = "0.4.40"
+colored = "3.0.0"
+gethostname = "1.0.1"
+lazy_static = "1.5.0"
+reedline = "0.12"
+
+[[bin]]
+name = "seashell"
