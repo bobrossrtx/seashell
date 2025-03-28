@@ -35,7 +35,7 @@ impl ArgParser {
                 let key = key_value[0];
                 let value = key_value.get(1).map(|v| v.to_string());
 
-                if let Some(def) = definitions.iter().find(|d| d.alias.as_deref() == Some(key)) {
+                if let Some(_) = definitions.iter().find(|d| d.alias.as_deref() == Some(key)) {
                     if let Some(value) = value {
                         self.options.insert(key.to_string(), value);
                     } else {
@@ -62,6 +62,7 @@ impl ArgParser {
         *self.flags.get(key).unwrap_or(&false)
     }
 
+    #[allow(dead_code)] // unused
     pub fn get_option(&self, key: &str) -> Option<&String> {
         self.options.get(key)
     }
