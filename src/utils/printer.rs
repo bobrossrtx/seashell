@@ -1,17 +1,41 @@
 use colored::*;
 
-pub enum MessageType {
-    Error,
-    Debug,
-    Info,
-    Warning,
-}
+pub struct Printer;
 
-pub fn print_message(message_type: MessageType, message: &str) {
-    match message_type {
-        MessageType::Error => println!("{}", format!("[ERROR]: {}", message).red()),
-        MessageType::Debug => println!("{}", format!("[DEBUG]: {}", message).blue()),
-        MessageType::Info => println!("{}", format!("[INFO]: {}", message).green()),
-        MessageType::Warning => println!("{}", format!("[WARNING]: {}", message).yellow()),
+impl Printer {
+    pub fn error(message: &str) {
+        println!(
+            "{}",
+            format!("[{}]: {}", "ERROR".bold().bright_red(), message).red()
+        );
+    }
+
+    pub fn debug(message: &str) {
+        println!(
+            "{}",
+            format!("[{}]: {}", "DEBUG".bold().bright_cyan(), message).blue()
+        );
+    }
+
+    pub fn info(message: &str) {
+        println!(
+            "{}",
+            format!("[{}]: {}", "INFO".bold().bright_blue(), message).green()
+        );
+    }
+
+    pub fn warning(message: &str) {
+        println!(
+            "{}",
+            format!("[{}]: {}", "WARNING".bold().bright_yellow(), message).yellow()
+        );
+    }
+
+    
+    pub fn success(message: &str) {
+        println!(
+            "{}",
+            format!("[{}]: {}", "SUCCESS".bold().bright_green(), message).green()
+        );
     }
 }

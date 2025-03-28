@@ -1,4 +1,4 @@
-use std::fs::{OpenOptions};
+use std::fs::OpenOptions;
 use std::io::Write;
 use std::sync::Mutex;
 use std::env;
@@ -10,6 +10,7 @@ lazy_static::lazy_static! {
 
 // Message types
 #[derive(Debug)]
+#[allow(dead_code)] // unused
 pub enum MessageType {
     Error,
     Debug,
