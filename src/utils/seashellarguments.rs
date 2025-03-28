@@ -1,3 +1,5 @@
+use crate::{settings::GLOBAL_SETTINGS, utils::printer::Printer};
+
 pub struct Argument {
     pub flag: String,
     pub alias: Option<char>,
@@ -36,7 +38,12 @@ impl SeashellArguments {
         let mut recognized = Vec::new();
         let mut unrecognized = Vec::new();
 
-        for arg in &self.args {
+        // Always add the first argument (application itself) to recognized
+        if let Some(first_arg) = self.args.first() {
+            recognized.push(first_arg.clone());
+        }
+
+        for arg in self.args.iter().skip(1) {
             if arg.starts_with("--") {
                 let flag = &arg[2..];
                 if self.defined_args.iter().any(|a| a.flag == flag) {
@@ -67,13 +74,39 @@ impl SeashellArguments {
     }
 
     pub fn print_help(&self) {
-        println!("Available arguments:");
+        println!("Usage: seashell [options]\n");
+        
+        println!("Options:");
         for arg in &self.defined_args {
             if let Some(alias) = arg.alias {
                 println!("-{}, --{:<10} {}", alias, arg.flag, arg.help);
             } else {
                 println!("    --{:<10} {}", arg.flag, arg.help);
             }
+        }
+    }
+
+    pub fn print_version(&self) {
+        println!("Seashell Version: {}", GLOBAL_SETTINGS.read().unwrap().version);
+        println!("Author: {}", GLOBAL_SETTINGS.read().unwrap().author);
+        println!("License: MIT");
+        println!("Repository: https://github.com/bobrossrtx/seashell");
+    }
+}
+
+impl ParsedArguments {
+    pub fn handle_unrecognized(&self, seashell_args: &SeashellArguments) {
+        if !self.unrecognized.is_empty() {
+            seashell_args.print_help();
+            
+            println!("");
+            Printer::error("Unrecognized arguments:");
+            let mut idx = 1;
+            for arg in &self.unrecognized {
+                println!("({:02})  |─ {:<10}", idx, arg);
+                idx += 1;
+            }
+            std::process::exit(1);
         }
     }
 }

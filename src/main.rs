@@ -10,7 +10,7 @@ use utils::logger::{log_message, MessageType as LoggerMessageType};
 use utils::printer::Printer;
 use utils::command_executor::execute_unix_command;
 use commands::command_map::initialize_command_map;
-use utils::seashellarguments::{SeashellArguments, ParsedArguments};
+use utils::seashellarguments::SeashellArguments;
 use settings::GLOBAL_SETTINGS;
 
 fn main() {
@@ -19,13 +19,22 @@ fn main() {
     // Define supported arguments
     seashell_args.define_argument("debug", Some('d'), "Enable debug mode");
     seashell_args.define_argument("help", Some('h'), "Show help information");
+    seashell_args.define_argument("version", None, "Show version information");
 
     // Parse arguments
     let parsed_args = seashell_args.parser();
 
+    // Handle unrecognized arguments
+    parsed_args.handle_unrecognized(&seashell_args);
+
     // Handle recognized arguments
     if parsed_args.recognized.contains(&"--help".to_string()) || parsed_args.recognized.contains(&"-h".to_string()) {
         seashell_args.print_help();
+        return;
+    }
+
+    if parsed_args.recognized.contains(&"--version".to_string()) {
+       seashell_args.print_version();
         return;
     }
 
