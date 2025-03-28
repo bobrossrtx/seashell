@@ -3,7 +3,6 @@ use std::path::Path;
 use crate::utils::logger::{log_message, MessageType as LoggerMessageType};
 use crate::utils::environment;
 use crate::parser;
-use crate::utils::printer::Printer;
 
 pub fn execute_unix_command(command: &parser::Command) -> Result<(), String> {
     log_message(LoggerMessageType::Debug, &format!("Executing Unix command: {} with args: {:?}", command.name, command.args)).ok();
