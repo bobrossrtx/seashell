@@ -9,8 +9,17 @@ chrono = "0.4.40"
 colored = "3.0.0"
 gethostname = "1.0.1"
 lazy_static = "1.5.0"
-reedline = "0.12"
+reedline = "0.39.0"
 tempfile = "3.19.1"
+
+[profile.debug]
+opt-level = 0
+debug = true
+
+
+[profile.release]
+opt-level = 3
+debug = false
 
 [[bin]]
 name = "seashell"
