@@ -1,3 +1,4 @@
+pub mod test;
 pub mod utils;
 pub mod commands;
 pub mod parser;

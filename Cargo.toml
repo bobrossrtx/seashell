@@ -10,6 +10,7 @@ colored = "3.0.0"
 gethostname = "1.0.1"
 lazy_static = "1.5.0"
 reedline = "0.12"
+tempfile = "3.19.1"
 
 [[bin]]
 name = "seashell"
