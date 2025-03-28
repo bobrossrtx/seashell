@@ -1,49 +1,37 @@
 use crate::utils::environment;
 use reedline::{Prompt, PromptEditMode, PromptHistorySearch};
-use colored::*;
+use ansi_term::Colour;
 
 pub struct SeashellPrompt;
 
 pub fn parse_prompt(template: &str) -> String {
     let mut result = String::new();
     let mut chars = template.chars().peekable();
-    let mut current_styles = vec![]; // Stack to handle multiple styles
 
     while let Some(c) = chars.next() {
-        if c == '/' {
-            if let Some(&next_char) = chars.peek() {
-                match next_char {
-                    'C' => { // Handle color
-                        chars.next(); // Consume 'C'
-                        if chars.next() == Some('(') {
-                            let mut color_name = String::new();
-                            while let Some(&next_char) = chars.peek() {
-                                if next_char == ')' {
-                                    chars.next(); // Consume ')'
-                                    break;
-                                }
-                                color_name.push(next_char);
-                                chars.next();
-                            }
-                            current_styles.push(color_name);
-                        }
-                    }
-                    'B' => { // Handle bold
-                        chars.next(); // Consume 'B'
-                        current_styles.push("bold".to_string());
-                    }
-                    'U' => { // Handle underline
-                        chars.next(); // Consume 'U'
-                        current_styles.push("underline".to_string());
-                    }
-                    'R' => { // Reset all styles
-                        chars.next(); // Consume 'R'
-                        current_styles.clear();
-                    }
-                    _ => {}
+        if c == '{' {
+            let mut color_name = String::new();
+            while let Some(&next_char) = chars.peek() {
+                if next_char == '}' {
+                    chars.next(); // Consume '}'
+                    break;
                 }
-                continue;
+                color_name.push(next_char);
+                chars.next();
             }
+
+            match color_name.as_str() {
+                "red" => result.push_str(&Colour::Red.prefix().to_string()),
+                "green" => result.push_str(&Colour::Green.prefix().to_string()),
+                "yellow" => result.push_str(&Colour::Yellow.prefix().to_string()),
+                "blue" => result.push_str(&Colour::Blue.prefix().to_string()),
+                "magenta" => result.push_str(&Colour::Purple.prefix().to_string()),
+                "cyan" => result.push_str(&Colour::Cyan.prefix().to_string()),
+                "white" => result.push_str(&Colour::White.prefix().to_string()),
+                "reset" => result.push_str(&Colour::White.suffix().to_string()),
+                _ => result.push_str(&format!("{{{}}}", color_name)), // Keep as is if unknown
+            }
+            continue;
         } else if c == '$' && chars.peek() == Some(&'{') {
             chars.next(); // Consume '{'
             let mut var_name = String::new();
@@ -56,31 +44,28 @@ pub fn parse_prompt(template: &str) -> String {
                 chars.next();
             }
 
-            if let Ok(value) = environment::get_var_as_string(&var_name) {
-                let mut styled_value = value.normal();
-                for style in &current_styles {
-                    match style.as_str() {
-                        "bold" => styled_value = styled_value.bold(),
-                        "underline" => styled_value = styled_value.underline(),
-                        color => styled_value = styled_value.color(color),
+            if let Ok(mut value) = environment::get_var_as_string(&var_name) {
+                if var_name == "PWD" {
+                    if let Ok(home) = environment::get_var_as_string("HOME") {
+                        if value.starts_with(&home) {
+                            value = value.replacen(&home, "~", 1);
+                        }
                     }
                 }
-                result.push_str(&styled_value.to_string());
+                result.push_str(&value);
             } else {
                 result.push_str(&format!("${{{}}}", var_name)); // Keep as is if not found
             }
             continue;
+        } else if c == '\\' {
+            if let Some(&escaped_char) = chars.peek() {
+                result.push(escaped_char);
+                chars.next(); // Consume escaped character
+            }
+            continue;
         }
 
-        let mut styled_char = c.to_string();
-        for style in &current_styles {
-            match style.as_str() {
-                "bold" => styled_char = styled_char.bold().to_string(),
-                "underline" => styled_char = styled_char.underline().to_string(),
-                color => styled_char = styled_char.color(color).to_string(),
-            }
-        }
-        result.push_str(&styled_char.to_string());
+        result.push(c);
     }
 
     result
@@ -88,13 +73,15 @@ pub fn parse_prompt(template: &str) -> String {
 
 impl Prompt for SeashellPrompt {
     fn render_prompt_left(&self) -> std::borrow::Cow<str> {
-        let prompt_template = environment::get_var_as_string("PROMPT").unwrap_or_else(|_| "[{USER}@{HOSTNAME}]-[{PWD}] $".to_string());
+        let prompt_template = environment::get_var_as_string("PROMPT_LEFT").unwrap_or_else(|_| "[{USER}@{HOSTNAME}]-[{PWD}] $".to_string());
         let formatted_prompt = parse_prompt(&prompt_template);
         formatted_prompt.into()
     }
 
     fn render_prompt_right(&self) -> std::borrow::Cow<str> {
-        "".into()
+        let prompt_template = environment::get_var_as_string("PROMPT_RIGHT").unwrap_or_else(|_| " ".to_string());
+        let formatted_prompt = parse_prompt(&prompt_template);
+        formatted_prompt.into()
     }
 
     fn render_prompt_indicator(&self, _edit_mode: PromptEditMode) -> std::borrow::Cow<str> {
