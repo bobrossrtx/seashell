@@ -1,3 +1,7 @@
+// Disabled (Might be used in the future):
+// Reason: This command is not fully implemented yet.
+//          and we are using other rust based libraries
+
 use std::fs;
 use std::os::unix::fs::MetadataExt;
 use std::time::UNIX_EPOCH;
@@ -65,11 +69,10 @@ impl LsCommand {
 }
 
 fn list_directory(path: &str, show_hidden: bool, detailed: bool, recursive: bool) -> Result<(), String> {
-    let entries = fs::read_dir(path).map_err(|e| format!("ls: failed to read directory '{}': {}", path, e))?;
-    let mut entries: Vec<_> = entries
+    let mut entries = fs::read_dir(path).map_err(|e| format!("ls: failed to read directory '{}': {}", path, e))?
         .filter_map(|entry| entry.ok())
         .filter(|entry| show_hidden || !entry.file_name().to_string_lossy().starts_with('.'))
-        .collect();
+        .collect::<Vec<_>>();
 
     // Sort entries alphabetically
     entries.sort_by(|a, b| a.file_name().cmp(&b.file_name()));

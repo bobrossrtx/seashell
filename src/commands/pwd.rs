@@ -39,7 +39,9 @@ impl PwdCommand {
             .map_err(|e| format!("pwd: failed to get current directory: {}", e))?;
         
         // Set the PWD environment variable
-        set_var("PWD", current_dir.to_str().unwrap_or_default());
+        if let Err(e) = set_var("PWD", current_dir.to_str().unwrap_or_default()) {
+            return Err(format!("pwd: failed to set PWD environment variable: {}", e));
+        }
 
         println!("{}", current_dir.display());
         Ok(())
