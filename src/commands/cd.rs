@@ -1,3 +1,5 @@
+use std::env;
+
 use crate::utils::environment::change_directory;
 use crate::utils::arg_parser::{ArgDefinition, ArgParser};
 use crate::utils::command_metadata::CommandMetadata;
@@ -35,7 +37,18 @@ impl CdCommand {
             return Ok(());
         }
 
-        let path = parser.positional.get(0).ok_or("cd: missing operand")?;
-        change_directory(path).map_err(|e| format!("cd: {}: {}", path, e))
+        let path = parser.positional.get(0).map_or_else(
+            || env::var("HOME").map_err(|_| "cd: HOME not set".to_string()),
+            |p| Ok(p.clone()),
+        )?;
+        // set the current directory with env::set_current_dir then we call change_directory
+        // to update the environment variables
+        env::set_current_dir(path.clone()).map_err(|e| format!("cd: {}: {}", path, e))?;
+        
+        let current_path = env::current_dir().map_err(|e| format!("cd: {}: {}", path, e))?;
+        let current_path_str = current_path.to_str().ok_or_else(|| format!("cd: invalid UTF-8 in path: {}", path))?;
+        change_directory(current_path_str).map_err(|e| format!("cd: {}: {}", path, e))?;
+        Ok(())
+
     }
 }

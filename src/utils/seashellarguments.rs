@@ -1,4 +1,4 @@
-use crate::{settings::GLOBAL_SETTINGS, utils::printer::Printer};
+use crate::{settings::{self}, utils::printer::Printer};
 
 pub struct Argument {
     pub flag: String,
@@ -69,6 +69,7 @@ impl SeashellArguments {
         }
     }
 
+    #[allow(dead_code)]
     pub fn get_args(&self) -> &Vec<String> {
         &self.args
     }
@@ -87,8 +88,8 @@ impl SeashellArguments {
     }
 
     pub fn print_version(&self) {
-        println!("Seashell Version: {}", GLOBAL_SETTINGS.read().unwrap().version);
-        println!("Author: {}", GLOBAL_SETTINGS.read().unwrap().author);
+        println!("Seashell Version: {}", settings::get_setting("version").unwrap_or_default());
+        println!("Author: {}", settings::get_setting("author").unwrap_or_default());
         println!("License: MIT");
         println!("Repository: https://github.com/bobrossrtx/seashell");
     }

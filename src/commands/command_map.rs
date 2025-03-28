@@ -10,5 +10,6 @@ pub fn initialize_command_map() -> HashMap<&'static str, fn(&[String]) -> Result
     command_map.insert("set", |args| commands::env::EnvSetCommand::new().execute(args));
     command_map.insert("get", |args| commands::env::EnvGetCommand::new().execute(args));
     command_map.insert("unset", |args| commands::env::EnvUnsetCommand::new().execute(args));
+    command_map.insert("seashell_version", |args| commands::seashell::seashell_version::SeashellVersionCommand::new().execute(args));
     command_map
 }
