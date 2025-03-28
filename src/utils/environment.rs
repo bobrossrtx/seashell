@@ -39,7 +39,9 @@ pub fn initialize_default_vars() -> HashMap<String, String> {
             .unwrap_or_else(|| "unknown".to_string());
         env_vars.insert("HOSTNAME".to_string(), hostname);
         env_vars.insert("PWD".to_string(), std::env::current_dir().unwrap_or_else(|_| "/".into()).to_str().unwrap_or("/").to_string());
-        env_vars.insert("PROMPT".to_string(), "/C(red)┌──[/C(pink)${USER}/C(red)@/C(blue)${HOSTNAME}/C(red)]/C(red)─/C(red)[/C(cyan)${PWD}/C(red)]\n└──╼".to_string());
+        // env_vars.insert("PROMPT_LEFT".to_string(), "/C(red)┌──[/C(white)${USER}/C(bright_yellow)@/C(cyan)${HOSTNAME}/C(red)]/C(red)─/C(red)[/C(green)${PWD}/C(red)]\n└──╼".to_string());
+        env_vars.insert("PROMPT_LEFT".to_string(), "{red}┌──[{white}${USER}{yellow}@{cyan}${HOSTNAME}{red}]{red}─[{green}${PWD}{red}]\r\n{yellow}$".to_string());
+        // env_vars.insert("PROMPT_RIGHT".to_string(), ("{}", ).to_string());
     }
 
     // Log shell session's default vars
